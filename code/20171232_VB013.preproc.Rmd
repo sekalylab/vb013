@@ -25,7 +25,7 @@ options(stringsAsFactors       = FALSE,
         readr.show_col_types   = FALSE,
         dplyr.summarise.inform = FALSE)
 workDir <- dirname(getwd())
-opts_chunk$set(tidy = FALSE, fig.path = file.path(workDir, "figure/"))
+opts_chunk$set(tidy = FALSE, fig.path = "../figure/")
 ht_opt$message <- FALSE
 ``` 
 
