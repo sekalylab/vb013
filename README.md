@@ -1,5 +1,9 @@
 # VB013: source code
 
+### Fig. 2a
+![Fig. 2](figure/BissaM_2023_NatCommun.Fig2A.png)  
+Fig. 2a: [R code [MD]](code/20201007_VB013.mdsNorm.Rmd)  
+
 ### RNA-Seq analysis
 code:  
 - preprocessing: [[MD]](code/20171232_VB013.preproc.md)  

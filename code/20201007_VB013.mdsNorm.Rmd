@@ -1,0 +1,74 @@
+---
+title: "VB013: MDS of normalized RNASeq"
+author: "Slim Fourati"
+date: "November 7, 2020"
+output: github_document
+---
+
+```{r load-packages}
+suppressPackageStartupMessages(library(package = "knitr"))
+suppressPackageStartupMessages(library(package = "readxl"))
+suppressPackageStartupMessages(library(package = "EDASeq"))
+suppressPackageStartupMessages(library(package = "edgeR"))
+suppressPackageStartupMessages(library(package = "tidyverse"))
+``` 
+
+```{r set-session-options}
+workDir <- dirname(getwd())
+opts_chunk$set(tidy = FALSE, fig.path = "../figure/")
+``` 
+
+# Load SeqExpressionSet
+```{r load-seqset-norm}
+load(file = file.path(workDir, "output/vb013.eset.RData"))
+``` 
+
+```{r fig2a, fig.width=6.57, fig.height=5.08}
+mat <- normCounts(eset)
+distMat <- dist(t(mat))
+fit <- cmdscale(distMat, k = 2, eig = TRUE)
+plotDF <- as.data.frame(fit$points) %>%
+  rownames_to_column() %>%
+  merge(x = pData(eset),
+        by.x = "sampleID",
+        by.y = "rowname") %>%
+    mutate(study = recode(study, 
+                          "P181 (ADULT)" = "Old",
+                          "VB013 (YNG)"  = "Young"),
+           study = factor(study,
+                          levels = c("Young", "Old")),
+           timePoint = recode(timePoint,
+                              "hm5" = "Basal",
+                              "h24" = "Week 12 + 24h"))
+plotLabel <- round((fit$eig/sum(fit$eig)) * 100)
+plotLabel <- plotLabel[1:2]
+plotLabel <- paste0(c("1st dimension (", "2nd dimension ("),
+                    plotLabel,
+                    "%)")
+ggplot(data    = plotDF,
+       mapping = aes(x     = V1,
+                     y     = V2)) +
+    geom_point(mapping = aes(color = study,
+                             fill  = study,
+                             shape = timePoint), 
+               size = 4) +
+    stat_ellipse(level = 0.65,
+                 mapping = aes(group = interaction(study, timePoint))) +
+    labs(x = plotLabel[[1]],
+         y = plotLabel[[2]]) +
+    scale_color_manual(name = "Study",
+                       values = c("Old" = "red",
+                                  "Young" = "transparent")) +
+    scale_shape_manual(name = "Timepoint", 
+                       values = c("Basal" = 24, "Week 12 + 24h" = 21)) +
+    scale_fill_manual(name = "Study",
+                      values = c("Old" = "transparent",
+                                  "Young" = "red")) +
+    theme_bw() +
+    theme(legend.key = element_blank()) +
+    guides(fill = guide_legend(override.aes = list(shape = 21)))
+```
+
+```{r session-info}
+sessionInfo()
+``` 
